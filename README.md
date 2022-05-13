@@ -5,8 +5,8 @@
 ## Descripción
 ```
 Esta es la parte backend del proyecto the-anuncios, un servidor en nodejs que tiene las siguientes secciones:
-seccion de autenticacion en base a google o resolver un captcha.
-una seccion que brinda información de anuncios de trabajo de un par de sitios web, en base a un poco de scraping.
+  * Una sección de autenticacion en base a google o resolver un captcha.
+  * Una sección que brinda información de anuncios de trabajo de un par de sitios web, en base a un poco de scraping.
 
 ```
 
