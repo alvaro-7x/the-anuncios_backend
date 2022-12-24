@@ -101,8 +101,8 @@ class Pagina1 extends PaginaBase
 
 		this.$('div.view-content','.region-content').children('.row').each((item, element)=>
 		{
-			const enlaceAnuncio = this.$(element).find('.field-content a').parent().html();
-
+			// const enlaceAnuncio = this.$(element).find('.field-content a').parent().html();
+			const enlaceAnuncio = this.$(element).find('.views-field .field-content a').parent().html();
 			if(enlaceAnuncio)
 			{
 				this.urlAnuncios.push(enlaceAnuncio);
@@ -128,8 +128,10 @@ class Pagina1 extends PaginaBase
 		for (var i = 0; i < cantidad; i++)
 		{
 			const anuncio = cheerio.load(this.urlAnuncios[i]);
-			const enlace = anuncio('a').attr('href');
+			let enlace = anuncio('a').attr('href');
 			
+			enlace = (enlace.substr(0,4) === 'http')? enlace: `${this.urlBase}${enlace}`;
+
 			let subHtml = '';
 			
 			if(process.env.EN_PRODUCCION == 'false')
@@ -158,7 +160,10 @@ class Pagina1 extends PaginaBase
 			const fuente = detalleAnuncio('.field--name-field-fuente div.field--item').children('a').attr('href');
 			const tipoContrato = detalleAnuncio('.views-field-field-tipo-empleo').text();
 
-			const empresa = detalleAnuncio('.views-field-field-nombre-empresa').text();
+			let empresa = detalleAnuncio('.views-field-field-nombre-empresa').text().trim();
+			const empresaAlternativa = detalleAnuncio('.row .views-field-title').text().trim();
+			empresa = empresa.length === 0? empresaAlternativa : empresa;
+
 			const fechaPublicacion = detalleAnuncio('.views-field-created').text();
 			const fechaVencimiento = detalleAnuncio('.views-field-field-fecha-empleo-1').text();
 			const ubicacion = detalleAnuncio('.views-field-field-ubicacion-del-empleo').text();
@@ -172,8 +177,15 @@ class Pagina1 extends PaginaBase
 
 			const tituloDatos = limpiarTexto(detalleAnuncio('h1').text());
 			const empresaDatos = procesarTexto(empresa);
+			
 			let logoEmpresaDatos = detalleAnuncio('div.field-content a').children('img').attr('src');
-			logoEmpresaDatos = this.urlBase + logoEmpresaDatos;
+			let logoEmpresaDatosAlternativa = detalleAnuncio('div.field-content').children('img').attr('src');
+			logoEmpresaDatos = logoEmpresaDatos? logoEmpresaDatos: logoEmpresaDatosAlternativa;
+
+			logoEmpresaDatos = (logoEmpresaDatos && logoEmpresaDatos.length>0)
+				? this.urlBase + logoEmpresaDatos
+				: '';
+
 			const fechaPublicacionDatos = procesarTexto(fechaPublicacion);
 			const fechaVencimientoDatos = procesarTexto(fechaVencimiento);
 			const ubicacionDatos = procesarTexto(ubicacion);
@@ -193,19 +205,30 @@ class Pagina1 extends PaginaBase
 	obtenerInformacionGeneral()
 	{
 		if(!this.$) throw new Error('El paquete cheerio no fue inicializado');
-		
+
 		this.region = this.$('h1.page-header')? this.$('h1.page-header').text().trim():'';
 		this.totalAnuncios = this.$('div.view-header')? this.$('div.view-header').text().trim().replace(/[^0-9]/g,''):'';
 
 		const totalPaginas = this.$('.pager__item--last').children('a').attr('href');
 		let nroPage = 0;
+		const nroPageInit = 0;
 		if(totalPaginas && totalPaginas.length > 0)
 		{
 			const tmp = totalPaginas.split('&');
 			[, nroPage] = tmp[tmp.length-1].split('=');
+			nroPage = parseInt(nroPage || '0');
 		}
-		
-		this.totalPaginas = nroPage;
+
+
+		// this.totalPaginas = nroPage;
+		if(nroPageInit !== nroPage)
+		{
+			this.totalPaginas = (nroPage) + 1;
+		}
+		else
+		{
+			this.totalPaginas = 1;
+		}
 
 		return {
 			region: this.region,

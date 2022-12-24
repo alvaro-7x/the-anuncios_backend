@@ -34,4 +34,4 @@ nodemon index.js
 
 ## Ver proyecto
 
-[Clic aquí](https://the-anuncios.herokuapp.com)
+[Clic aquí](https://anuncios-angular.fly.dev)

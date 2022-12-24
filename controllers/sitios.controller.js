@@ -5,12 +5,13 @@ const sitio1 = async (req, res) =>
 {
 	const {departamento = '', termino = '', page:pagina = 1 } = req.query;
 
+	const paginaBusqueda = (pagina < 0)? 0: (pagina-1);
 	const urlBase = 'https://trabajando.com.bo';
-	const url = `https://trabajando.com.bo/trabajo/${departamento}?buscar=${termino}&page=${pagina}`;
-	
+	const url = `https://trabajando.com.bo/trabajo/${departamento}?buscar=${termino}&page=${paginaBusqueda}`;
+
 	try
 	{
-		const datosSitio = new Pagina1(urlBase, url, termino, departamento, pagina);
+		const datosSitio = new Pagina1(urlBase, url, termino, departamento, paginaBusqueda);
 		
 		// inicializamos los datos, se esperara 0 segundos en una peticion y otra o se puede dejar vacio 
 		// para esperar entre tiempoMin=1.7, tiempoMax=2.9
@@ -32,7 +33,6 @@ const sitio1 = async (req, res) =>
 	}
 	catch(e)
 	{
-		console.log(e);
 		return res.status(500).json({
 			err: true,
 			msg: 'No se pudo obtener datos'

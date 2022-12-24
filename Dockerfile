@@ -1,0 +1,20 @@
+
+FROM node:14-alpine
+WORKDIR /app
+
+ARG NODE_ENV
+ENV NODE_ENV $NODE_ENV
+
+ARG EN_PRODUCCION
+ENV EN_PRODUCCION $EN_PRODUCCION
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+ENV PORT 3000
+EXPOSE $PORT
+
+CMD [ "npm", "start" ]

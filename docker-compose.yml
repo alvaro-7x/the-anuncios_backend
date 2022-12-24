@@ -1,0 +1,28 @@
+version: '3'
+services:
+  scraping-backend:
+    container_name: scraping-backend
+    hostname: scraping-backend
+    build:
+       context: ./
+       dockerfile: Dockerfile
+    ports:
+        - 3000:3000
+    networks:
+        - scraping-net
+    environment:
+        NODE_ENV: production
+        EN_PRODUCCION: true
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 100M
+        reservations:
+          cpus: '0.1'
+          memory: 50M
+
+networks:
+  scraping-net:
+    driver: bridge
